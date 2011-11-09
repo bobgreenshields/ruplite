@@ -18,3 +18,31 @@ class Ruplite
 		@config = config
 	end
 
+	def source
+		" #{@config[:source]}"
+	end
+
+	def target
+		" #{@config[:target]}"
+	end
+
+	def options
+		if @config.has_key? :options
+			" #{@config[:options].join(" ")}"
+		else
+			""
+		end
+	end
+
+	def action
+		if @config.has_key? :action
+			" #{@config[:action]}"
+		else
+			""
+		end
+	end
+
+	def command
+		"duplicity#{action}#{options}#{source}#{target}"
+	end
+end
