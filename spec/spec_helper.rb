@@ -1,0 +1,2 @@
+require 'ruplite'
+require 'testlogger'
