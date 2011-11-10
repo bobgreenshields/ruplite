@@ -20,6 +20,14 @@ describe Ruplite do
 		@rup = Ruplite.new(@config, @log)
 	end
 
+	describe "#source" do
+		subject { @rup.source }
+
+		context "when /mnt/data" do
+			it { should == " #{@source}" }
+		end
+	end
+
 	it "should return source with a space prepended" do
 		@rup.source.should == " #{@source}"
 	end
