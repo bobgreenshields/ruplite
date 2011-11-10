@@ -32,8 +32,17 @@ describe Ruplite do
 			before(:each) do
 				@words = @rup.cmd.split(" ")
 			end
+
 			it "should have duplicity as its first word" do
 				@words[0].should == "duplicity"
+			end
+
+			it "should have the target as its last word" do
+				@words[-1].should == @target
+			end
+
+			it "should have the source as its next to last word" do
+				@words[-2].should == @source
 			end
 		end
 	end

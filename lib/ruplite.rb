@@ -24,6 +24,9 @@ class Ruplite
 	def cmd
 		cmdarr = ['duplicity']
 
+		cmdarr << @config[:source]
+		cmdarr << @config[:target]
+
 		cmdarr.join(" ")
 	end
 end
