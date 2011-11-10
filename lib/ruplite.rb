@@ -13,36 +13,17 @@ class NullLogger
 end
 
 class Ruplite
-	def initialize (config, logger = nil)
-		@logger = logger || NullLogger.new
+	attr_reader :name
+
+	def initialize (name, config, logger = nil)
+		@name = name
 		@config = config
+		@logger = logger || NullLogger.new
 	end
 
-	def source
-		" #{@config[:source]}"
-	end
+	def cmd
+		cmdarr = ['duplicity']
 
-	def target
-		" #{@config[:target]}"
-	end
-
-	def options
-		if @config.has_key? :options
-			" #{@config[:options].join(" ")}"
-		else
-			""
-		end
-	end
-
-	def action
-		if @config.has_key? :action
-			" #{@config[:action]}"
-		else
-			""
-		end
-	end
-
-	def command
-		"duplicity#{action}#{options}#{source}#{target}"
+		cmdarr.join(" ")
 	end
 end
