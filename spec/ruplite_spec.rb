@@ -18,7 +18,7 @@ describe Ruplite do
 #		@config[:action] = @action
 #		@config[:options] = @options
 		@config[:password] = @password
-		@rup = Ruplite.new(@name, @config, @log)
+#		@rup = Ruplite.new(@name, @config, @log)
 	end
 
 	shared_examples_for "all inputs" do
@@ -48,6 +48,9 @@ describe Ruplite do
 	end
 
 	context "no actions and no options" do
+		before(:each) do
+			@rup = Ruplite.new(@name, @config, @log)
+		end
 		it_should_behave_like "all inputs"
 	end
 
