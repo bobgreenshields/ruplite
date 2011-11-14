@@ -16,7 +16,7 @@ class Ruplite
 	attr_reader :name
 
 	def initialize (name, config, logger = nil)
-		@env = []
+		@env_arr = []
 		@name = name
 		@config = config
 		@logger = logger || NullLogger.new
