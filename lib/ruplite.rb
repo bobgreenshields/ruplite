@@ -19,10 +19,17 @@ class Ruplite
 		@name = name
 		@config = config
 		@logger = logger || NullLogger.new
+		@options = ["--name #{@name}"]
+		if config.has_key? :options
+			config[:options].each { |o| @options << o }
+		end
 	end
 
 	def cmd
 		cmdarr = ['duplicity']
+		cmdarr << @config[:action] if @config.has_key? :action
+
+		cmdarr << @options.join(" ")
 
 		cmdarr << @config[:source]
 		cmdarr << @config[:target]

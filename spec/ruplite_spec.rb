@@ -47,13 +47,104 @@ describe Ruplite do
 		end
 	end
 
+	shared_examples_for "without an action" do
+		describe "#cmd" do
+			before(:each) do
+				@words = @rup.cmd.split(" ")
+			end
+
+			it "should have --name as its second word" do
+				@words[1].should == "--name"
+			end
+
+			it "should have the name as it third word" do
+				@words[2].should == @name
+			end
+		end
+	end
+
+	shared_examples_for "with an action" do
+		describe "#cmd" do
+			before(:each) do
+				@words = @rup.cmd.split(" ")
+			end
+
+			it "should have the action as its second word" do
+				@words[1].should == @action
+			end
+
+			it "should have --name as its third word" do
+				@words[2].should == "--name"
+			end
+
+			it "should have the name as it fourth word" do
+				@words[3].should == @name
+			end
+		end
+	end
+
+	shared_examples_for "with options" do
+		it "should have all the words from options before the last 2 words" do
+			length = @options.join(" ").split(" ").length
+			start = -2 - length
+			@words[start,length].join(" ").should == @options.join(" ")
+		end
+	end
+
 	context "no actions and no options" do
 		before(:each) do
 			@rup = Ruplite.new(@name, @config, @log)
 		end
+
 		it_should_behave_like "all inputs"
+		it_should_behave_like "without an action"
+
+		before(:each) do
+			@words = @rup.cmd.split(" ")
+		end
+
+		it "should be 5 words long" do
+			@words.length.should == 5
+		end
+
 	end
 
+	context "with an action but no options" do
+		before(:each) do
+			@config[:action] = @action
+			@rup = Ruplite.new(@name, @config, @log)
+		end
+
+		it_should_behave_like "all inputs"
+		it_should_behave_like "with an action"
+
+		before(:each) do
+			@words = @rup.cmd.split(" ")
+		end
+
+		it "should be 6 words long" do
+			@words.length.should == 6
+		end
+	end
+
+	context "no actions but with options" do
+		before(:each) do
+			@config[:options] = @options
+			@rup = Ruplite.new(@name, @config, @log)
+		end
+
+		it_should_behave_like "all inputs"
+		it_should_behave_like "without an action"
+		it_should_behave_like "with options"
+
+		before(:each) do
+			@words = @rup.cmd.split(" ")
+		end
+
+		it "should be 9 words long" do
+			@words.length.should == 9
+		end
+	end
 
 
 end
