@@ -220,4 +220,56 @@ describe Ruplite do
 		end
 	end
 
+	describe "initialization checks" do
+		%w(source target).each do |inp|
+			it "should raise an error if #{inp} is not defined" do
+				@config.delete inp.to_sym
+				lambda {Ruplite.new(@name, @config, @log)}.
+					should raise_error(ArgumentError)
+			end
+		end
+
+		it "should raise an error if a --name option is passed" do
+			@options << "--name new-backup"
+			@config[:options] = @options
+			lambda {Ruplite.new(@name, @config, @log)}.
+				should raise_error(ArgumentError)
+		end
+	end
+
+	describe "setting environment variables" do
+		before(:each) do
+			@config[:env] = @env
+			@config[:password] = @password
+			@rup = Ruplite.new(@name, @config, @log)
+			@rup.stub!(:set_system_env_var).as_null_object
+		end
+		describe "#set_env_vars" do
+			it "should call set_system_env_var method for each env value" do
+				@rup.should_receive(:set_system_env_var).
+					exactly(@env.length + 1).times
+				@rup.set_env_vars
+			end
+		end
+
+		describe "#reset_env_vars" do
+			context "when no env vars have been set" do
+				it "should not call set_system_env_var method" do
+					@rup.should_not_receive(:set_system_env_var)
+					@rup.reset_env_vars
+				end
+			end
+
+			context "when env vars have been set" do
+				before { @rup.set_env_vars }
+
+				it "should call set_system_env_var method for each env value" do
+					@rup.should_receive(:set_system_env_var).
+						exactly(@env.length + 1).times
+					@rup.reset_env_vars
+				end
+			end
+		end
+	end
+
 end
