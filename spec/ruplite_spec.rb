@@ -12,12 +12,14 @@ describe Ruplite do
 		@options << "--encrypt-key AA0E73D2"
 		@options << "--sign-key AA0E73D2"
 		@password = "xxxxx"
+		@env_pword = "env pword"
+		@env = {"aws_password" => "awsaws", "aws_key" => "a36b7f4"}
 		@config = {}
 		@config[:source] = @source
 		@config[:target] = @target
 #		@config[:action] = @action
 #		@config[:options] = @options
-		@config[:password] = @password
+#		@config[:password] = @password
 #		@rup = Ruplite.new(@name, @config, @log)
 	end
 
@@ -146,5 +148,76 @@ describe Ruplite do
 		end
 	end
 
+	shared_examples_for "env variables" do
+		it "should capitalise each key and have each value in env key" do
+			@env.each do |k, v|
+				upcase_key = k.upcase
+				@rup.env[upcase_key].should == v unless upcase_key == "PASSWORD"
+			end
+		end
+	end
+
+	describe "#define_env_variables" do
+		context "with a password key set" do
+			before(:each) do
+				@config[:password] = @password
+			end
+			context "with no env variable password" do
+				before(:each) do
+					@config[:env] = @env
+					@rup = Ruplite.new(@name, @config, @log)
+				end
+
+				it_should_behave_like "env variables"
+
+				it "should have the password keys value" do
+					@rup.env["PASSWORD"].should == @password
+				end
+			end
+
+			context "with an env variable password set" do
+				before(:each) do
+					@env["PASSWORD"] = @env_pword
+					@config[:env] = @env
+					@rup = Ruplite.new(@name, @config, @log)
+				end
+
+				it_should_behave_like "env variables"
+
+				it "should have the password keys value" do
+					@rup.env["PASSWORD"].should == @password
+				end
+			end
+		end
+
+		context "without password key set" do
+			context "with no env variable password" do
+				before(:each) do
+					@config[:env] = @env
+					@rup = Ruplite.new(@name, @config, @log)
+				end
+
+				it_should_behave_like "env variables"
+
+				it "should not have a password key" do
+					@rup.env.should_not have_key "PASSWORD"
+				end
+			end
+
+			context "with an env variable password set" do
+				before(:each) do
+					@env["PASSWORD"] = @env_pword
+					@config[:env] = @env
+					@rup = Ruplite.new(@name, @config, @log)
+				end
+
+				it_should_behave_like "env variables"
+
+				it "should have the env variables password value" do
+					@rup.env["PASSWORD"].should == @env_pword
+				end
+			end
+		end
+	end
 
 end
