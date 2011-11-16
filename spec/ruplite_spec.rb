@@ -148,6 +148,16 @@ describe Ruplite do
 		end
 	end
 
+	describe "#cmd" do
+		it "should produce a good cmd string from inputs" do
+			@config[:action] = @action
+			@config[:options] = @options
+			@rup = Ruplite.new(@name, @config, @log)
+			@rup.cmd.should == "duplicity #{@action} --name #{@name} #{@options.join(" ")} #{@source} #{@target}"
+		end
+
+	end
+
 	shared_examples_for "env variables" do
 		it "should capitalise each key and have each value in env key" do
 			@env.each do |k, v|

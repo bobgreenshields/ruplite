@@ -1,3 +1,5 @@
+require 'open4'
+
 class NullLogger
 	def initialize
 		@absorb = [:info, :debug, :warn, :fatal]
@@ -79,4 +81,24 @@ class Ruplite
 		cmdarr << @target
 		cmdarr.join(" ")
 	end
+
+	def run
+		out_arr = []
+		err_arr = []
+		details_arr =[]
+		details_arr << "Running duplicity backup called #{@name}"
+		details_arr << "calling with #{cmd}"
+		details_arr.each { |l| @logger.info l }
+
+		status = Open4::popen4(cmd) do |pid, stdin, stdout, stderr|
+			out_arr = stdout.readlines
+			err_arr = stderr.readlines
+		end
+
+		exit_status = status.exitstatus
+
+
+
+	end
+
 end
