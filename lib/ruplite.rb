@@ -91,14 +91,30 @@ class Ruplite
 		details_arr.each { |l| @logger.info l }
 
 		status = Open4::popen4(cmd) do |pid, stdin, stdout, stderr|
-			out_arr = stdout.readlines
-			err_arr = stderr.readlines
+			stdout.readlines.each { |l| out_arr << l.strip }
+			stderr.readlines.each { |l| err_arr << l.strip }
 		end
 
 		exit_status = status.exitstatus
 
+		out_arr.each { |l| @logger.info l }
+		err_arr.each { |l| @logger.error l }
 
+		details_arr = details_arr + out_arr
+		if err_arr.length > 0
+			details_arr << "**** Stderr ****"
+			details_arr = details_arr + err_arr
+		end
 
+		s = "Exit status was #{exit_status}"
+		if exit status = 0
+			@logger.info s
+		else
+			@logger.error s
+		end
+		details_arr << s
+
+		@run_info = details_arr.join("\n")
 	end
 
 end

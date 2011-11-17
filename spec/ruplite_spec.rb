@@ -8,7 +8,6 @@ describe Ruplite do
 		@target = 'file:///mnt/media/backup'
 		@action = 'incremental'
 		@options = []
-#		@options << "--name data"
 		@options << "--encrypt-key AA0E73D2"
 		@options << "--sign-key AA0E73D2"
 		@password = "xxxxx"
@@ -17,10 +16,6 @@ describe Ruplite do
 		@config = {}
 		@config[:source] = @source
 		@config[:target] = @target
-#		@config[:action] = @action
-#		@config[:options] = @options
-#		@config[:password] = @password
-#		@rup = Ruplite.new(@name, @config, @log)
 	end
 
 	shared_examples_for "all inputs" do
