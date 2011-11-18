@@ -2,7 +2,7 @@ require 'open4'
 
 class NullLogger
 	def initialize
-		@absorb = [:info, :debug, :warn, :fatal]
+		@absorb = [:info, :debug, :error, :warn, :fatal]
 	end
 
 	def method_missing(meth, *args, &blk)
@@ -54,24 +54,25 @@ class Ruplite
 		if config.has_key? :env
 			config[:env].each { |k, v| @env[k.upcase] = v }
 		end
-		@env["PASSWORD"] = config[:password] if config.has_key? :password
+		@env["PASSPHRASE"] = config[:passphrase] if config.has_key? :passphrase
 	end
 
-	def set_systen_env_var(name, value)
+	def set_system_env_var(name, value)
 #		ENV[name] = value
+		`export #{name}=#{value}`
 	end
 
-	def set_env_vars
-		@env.each do |k, v|
-			@set_envs << k
-			set_system_env_var(k, v)
-		end
-	end
+#	def set_env_vars
+#		@env.each do |k, v|
+#			@set_envs << k
+#			set_system_env_var(k, v)
+#		end
+#	end
 
-	def reset_env_vars
-		@set_envs.each { |k| set_system_env_var(k, "") }
-		@set_envs.clear
-	end
+#	def reset_env_vars
+#		@set_envs.each { |k| set_system_env_var(k, "") }
+#		@set_envs.clear
+#	end
 
 	def cmd
 		cmdarr = ['duplicity']
@@ -82,32 +83,46 @@ class Ruplite
 		cmdarr.join(" ")
 	end
 
+	def run_cmd
+		res = {:out => [], :err => []}
+		status = Open4::popen4("sh") do |pid, stdin, stdout, stderr|
+			@env.each do |k, v|
+				stdin.puts "echo \"exporting #{k}\""
+				stdin.puts "export #{k}=#{v}"
+			end
+			stdin.puts "echo \"running #{cmd}\""
+			stdin.puts cmd
+			@env.each_key do |k|
+				stdin.puts "echo \"unsetting #{k}\""
+				stdin.puts "unset #{k}"
+			end
+			stdin.close
+			stdout.readlines.each { |l| res[:out] << l.strip }
+			stderr.readlines.each { |l| res[:err] << l.strip }
+		end
+		res[:exit_status] = status.exitstatus
+		res
+	end
+
 	def run
-		out_arr = []
-		err_arr = []
 		details_arr =[]
 		details_arr << "Running duplicity backup called #{@name}"
 		details_arr << "calling with #{cmd}"
-		details_arr.each { |l| @logger.info l }
+#		details_arr.each { |l| @logger.info l }
 
-		status = Open4::popen4(cmd) do |pid, stdin, stdout, stderr|
-			stdout.readlines.each { |l| out_arr << l.strip }
-			stderr.readlines.each { |l| err_arr << l.strip }
-		end
+		runinfo = run_cmd
 
-		exit_status = status.exitstatus
-
-		out_arr.each { |l| @logger.info l }
-		err_arr.each { |l| @logger.error l }
-
-		details_arr = details_arr + out_arr
-		if err_arr.length > 0
+		details_arr = details_arr + runinfo[:out]
+		if runinfo[:err].length > 0
 			details_arr << "**** Stderr ****"
-			details_arr = details_arr + err_arr
+			details_arr = details_arr + runinfo[:err]
 		end
 
-		s = "Exit status was #{exit_status}"
-		if exit status = 0
+		runinfo[:out].each { |l| @logger.info l }
+		runinfo[:err].each { |l| @logger.error l }
+
+		s = "Exit status was #{runinfo[:exit_status]}"
+		if runinfo[:exit_status] = 0
 			@logger.info s
 		else
 			@logger.error s
