@@ -7,6 +7,7 @@ KEYS = ['--encrypt-key 87909562', '--sign-key F899621D']
 FULL_OPT = ['--full-if-older-than 30D']
 SIGN_PHRASE = 'xxx'
 ENCRYPT_PHRASE = "********"
+LOG_FILE = '/var/log/backup.log'
 
 data_cfg = {}
 data_cfg[:source] = DATA_SRC
@@ -34,32 +35,11 @@ verify_secure_cfg[:options] << KEYS
 verify_secure_cfg[:action] = "verify"
 verify_secure_cfg[:passphrase] = ENCRYPT_PHRASE
 
-log = Logger.new(STDOUT)
+#log = Logger.new(STDOUT)
+log = Logger.new(LOG_FILE, 10, 1024000)
 
 data = Ruplite.new('data', data_cfg, logger)
-secure = Ruplite.new('secure', secure_cfg, logger)
-
-verify_secure = Ruplite.new('secure', verify_secure_cfg, logger)
-
-
-config = {}
-
-config[:source] = '/home/bobg/icon'
-config[:target] = 'file:///home/bobg/backups/test'
-config[:passphrase] = 'xxx'
-#config[:options] = ['--encrypt-key 87909562', '--sign-key 31894F89']
-config[:options] = ['--encrypt-key 87909562', '--sign-key F899621D']
-
-
-#opts = []
-#opts << '--encrypt-key 87909562'
-#opts << '--sign-key 31894F89'
+puts data.run
+#secure = Ruplite.new('secure', secure_cfg, logger)
 #
-#config = {:source => src, :target => tgt, :options => opts}
-
-test = Ruplite.new('Test', config)
-#test = Ruplite.new('Test', config, log)
-
-puts test.run
-#test.run
-
+#verify_secure = Ruplite.new('secure', verify_secure_cfg, logger)
