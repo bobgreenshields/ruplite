@@ -21,34 +21,75 @@ class Ruplite
 		@config = config
 		@set_envs = []
 		@logger = logger || NullLogger.new
-		check_config_for_key(:name)
-		check_config_for_key(:target)
+		set_reqd_var_from_config :name
+		set_reqd_var_from_config :target
+		[:source, :action, :action_arg, :options, :env].each do |key|
+			set_var_from_config key
+		end
 		initialize_action
 	end
 
-	def check_config_for_key(key)
+	def set_reqd_var_from_config(key)
 		unless @config.has_key? key
 			raise ArgumentError, "Config hash must have a :#{key}"
 		end
+		set_var_from_config key
+	end
+
+	def set_var_from_config(key)
+		self.instance_variable_set("@#{key}", @config[key])
+	end
+
+	def action_no_source
+		%w(collection-status list-current-files cleanup)
+	end
+
+	def action_with_source
+		%w(full incremental restore verify)
+	end
+
+	def action_with_arg
+		%w(remove-older-than remove-all-but-n-full
+			 remove-all-inc-of-but-n-full)
 	end
 
 	def initialize_action
 		case
-		when ! @config.has_key?(:action)
-			check_config_for_key(:source)
-			@source = @config[:source]
+		when ! @action
+			unless @source
+				raise ArgumentError,
+					"Config hash must have a source when it has no action"
+			end
+			@action_arg = nil
+		when action_no_source.include?(@action)
+			@source = nil
+			@action_arg = nil
+		when action_with_source.include?(@action)
+			unless @source
+				raise ArgumentError,
+					"Config hash must have a source when it's action is #{@action} "
+			end
+			@action_arg = nil
+		when action_with_arg.include?(@action)
+			unless @action_arg
+				raise ArgumentError,
+					"Config hash must have an action_arg when it's action is #{@action} "
+			end
+			@source = nil
 		else
-			raise ArgumentError, "Unknown action of #{@config[:action]}"
+			raise ArgumentError, "Unknown action of #{@action}"
 		end
 	end
 
 	def cmd
 		cmdarr = ['duplicity']
+		cmdarr << @action if @action
+		cmdarr << @action_arg if @action_arg
 		cmdarr << '--name'
-		cmdarr << @config[:name]
-		cmdarr << @config[:options].join(" ") if @config.has_key? :options
+		cmdarr << @name
+		cmdarr << @options.join(" ") if @options
 		cmdarr << @source if @source
-		cmdarr << @config[:target]
+		cmdarr << @target
 		cmdarr.join(" ")
 	end
 
