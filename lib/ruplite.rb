@@ -23,7 +23,8 @@ class Ruplite
 		@logger = logger || NullLogger.new
 		set_reqd_var_from_config :name
 		set_reqd_var_from_config :target
-		[:source, :action, :action_arg, :options, :env].each do |key|
+		[:source, :action, :action_arg, :options, :env,
+			:passphrase].each do |key|
 			set_var_from_config key
 		end
 		initialize_action
@@ -83,6 +84,8 @@ class Ruplite
 	end
 
 	def initialize_env
+		@env = {}
+		@env["PASSPHRASE"] = @passphrase if @passphrase 
 	end
 
 	def cmd

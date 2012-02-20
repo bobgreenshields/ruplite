@@ -9,3 +9,9 @@ shared_context "option words" do
 		@option_word = @options.join(" ").split(" ")
 	end
 end
+
+shared_context "with a passphrase key set" do
+	before :each do
+		@config[:passphrase] = @password
+	end
+end

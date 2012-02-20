@@ -106,3 +106,13 @@
 		it_behaves_like "a backup with a source"
 
 	end # action with a source
+
+
+	shared_examples_for "all env with a passphrase key" do
+		it "should have a key of PASSPHRASE" do
+			Ruplite.new(@config).env.keys.should include "PASSPHRASE"
+		end
+		it "should have the password for the key of PASSPHRASE" do
+			Ruplite.new(@config).env["PASSPHRASE"].should == @password
+		end
+	end

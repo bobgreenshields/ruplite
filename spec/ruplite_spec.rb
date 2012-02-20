@@ -21,6 +21,7 @@ describe Ruplite do
 		@config[:action] = @action
 		@config[:action_arg] = @action_arg
 		@config[:options] = @options
+		@config[:env] = @env
 	end
 
 	describe "#initialize_env" do
@@ -31,7 +32,51 @@ describe Ruplite do
 			it "@env should be a hash" do
 				Ruplite.new(@config).env.should be_a_kind_of Hash
 			end
+
+			context "with no passphrase key set" do
+				it "should have no items" do
+					Ruplite.new(@config).env.should have(0).things
+				end
+			end
+			context "with a passphrase key set" do
+				include_context "with a passphrase key set"
+
+				it_behaves_like "all env with a passphrase key"
+
+				it "should have 1 item" do
+					Ruplite.new(@config).env.should have(1).things
+				end
+			end
 		end # no config env
+
+		context "with a config env" do
+			it "@env should be a hash" do
+				Ruplite.new(@config).env.should be_a_kind_of Hash
+			end
+			context "with no passphrase key set" do
+#				it "should have no items" do
+#					Ruplite.new(@config).env.should have(0).things
+#				end
+			end
+			context "with a passphrase key set" do
+				include_context "with a passphrase key set"
+
+				context "with no passphrase in the env" do
+					it_behaves_like "all env with a passphrase key"
+				end
+
+				context "with a passphrase in the env" do
+					before :each do
+						@env["PASSPHRASE"] = @env_pword
+					end
+
+					it_behaves_like "all env with a passphrase key"
+				end
+#				it "should have 1 item" do
+#					Ruplite.new(@config).env.should have(1).things
+#				end
+			end
+		end # with a config env
 	end # initialize_env
 
 	context "with no action" do
