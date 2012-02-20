@@ -23,6 +23,17 @@ describe Ruplite do
 		@config[:options] = @options
 	end
 
+	describe "#initialize_env" do
+		context "with no config env" do
+			before :each do
+				@config.delete :env
+			end
+			it "@env should be a hash" do
+				Ruplite.new(@config).env.should be_a_kind_of Hash
+			end
+		end # no config env
+	end # initialize_env
+
 	context "with no action" do
 		before :each do
 			@config.delete :action

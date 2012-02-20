@@ -27,6 +27,7 @@ class Ruplite
 			set_var_from_config key
 		end
 		initialize_action
+		initialize_env
 	end
 
 	def set_reqd_var_from_config(key)
@@ -79,6 +80,9 @@ class Ruplite
 		else
 			raise ArgumentError, "Unknown action of #{@action}"
 		end
+	end
+
+	def initialize_env
 	end
 
 	def cmd
