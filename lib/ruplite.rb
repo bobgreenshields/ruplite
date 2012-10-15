@@ -1,4 +1,4 @@
-require 'open4'
+#require 'open4'
 
 class NullLogger
 	def initialize
@@ -21,8 +21,9 @@ class Ruplite
 		@config = config
 		@set_envs = []
 		@logger = logger || NullLogger.new
-		set_reqd_var_from_config :name
-		set_reqd_var_from_config :target
+#		set_reqd_var_from_config :name
+		[:name, :target].each { |key| set_reqd_var_from_config key }
+#		set_reqd_var_from_config :target
 		[:source, :action, :action_arg, :options, :env,
 			:passphrase].each do |key|
 			set_var_from_config key
@@ -53,6 +54,15 @@ class Ruplite
 	def action_with_arg
 		%w(remove-older-than remove-all-but-n-full
 			 remove-all-inc-of-but-n-full)
+	end
+
+	def check_boolean(val)
+		return false unless val.respond_to? :to_s
+		if val.to_s.downcase == "true" then
+			true
+		else
+			false
+		end
 	end
 
 	def initialize_action
