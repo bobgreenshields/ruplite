@@ -79,6 +79,31 @@ describe Ruplite do
 		end # with a config env
 	end # initialize_env
 
+	describe "# check_boolean" do
+		%w(true True TRUE).each do |true_str|
+			context "with #{true_str} string" do
+				it "should return true" do
+					Ruplite.new(@config).check_boolean(true_str).should == true
+				end
+			end
+		end
+		context "with symbol :true" do
+			it "should return true" do
+				Ruplite.new(@config).check_boolean(:true).should == true
+			end
+		end
+		context "with non true string" do
+			it "should return false" do
+				Ruplite.new(@config).check_boolean("blurb").should == false
+			end
+		end
+		context "with something that does not coerce to string" do
+			it "should return false" do
+				Ruplite.new(@config).check_boolean(nil).should == false
+			end
+		end
+	end
+
 	context "with no action" do
 		before :each do
 			@config.delete :action
