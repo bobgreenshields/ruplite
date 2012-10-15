@@ -16,12 +16,29 @@
 		describe "#cmd" do
 			include_context "cmd words"
 
-			it "should have duplicity as it's first word" do
+			it "should have sudo as it's first word" do
 				@cmd_word[0].should == "duplicity"
 			end
 			it "should have the target as it's last word" do
 				@cmd_word[-1].should == @target
 			end
+
+			context "when run as sudo" do
+				include_context "when run as sudo"
+				include_context "cmd words"
+
+				it "should have duplicity as it's first word" do
+					@cmd_word[0].should == "sudo"
+				end
+				it "should have duplicity as it's second word" do
+					@cmd_word[1].should == "duplicity"
+				end
+				it "should have the target as it's last word" do
+					@cmd_word[-1].should == @target
+				end
+
+			end # when run as sudo
+
 		end # cmd
 	end # all backups
 

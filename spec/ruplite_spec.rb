@@ -122,6 +122,16 @@ describe Ruplite do
 				it "should have 5 words" do
 					@cmd_word.length.should == 5
 				end
+
+				context "when run as sudo" do
+					include_context "when run as sudo"
+					include_context "cmd words"
+
+					it "should have 6 words" do
+						@cmd_word.length.should == 6
+					end
+				end # run as sudo
+
 			end # cmd
 		end # and no options
 
@@ -142,6 +152,23 @@ describe Ruplite do
 				it "should have 5 plus no of option words" do
 					@cmd_word.length.should == 5 + @option_word.length
 				end
+
+				context "when run as sudo" do
+					include_context "when run as sudo"
+					include_context "cmd words"
+					include_context "option words"
+
+					it "options should be words 5 onwards" do
+						@option_word.each_index do |i|
+							@cmd_word[i + 4].should == @option_word[i]
+						end
+					end
+
+					it "should have 6 plus no of option words" do
+						@cmd_word.length.should == 6 + @option_word.length
+					end
+				end # when run as sudo
+
 			end # cmd
 		end # and with options
 	end # with no action

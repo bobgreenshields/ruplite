@@ -15,3 +15,9 @@ shared_context "with a passphrase key set" do
 		@config[:passphrase] = @password
 	end
 end
+
+shared_context "when run as sudo" do
+	before :each do
+		@config[:run_as_sudo] = "true"
+	end
+end

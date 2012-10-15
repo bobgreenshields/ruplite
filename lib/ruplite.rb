@@ -21,9 +21,8 @@ class Ruplite
 		@config = config
 		@set_envs = []
 		@logger = logger || NullLogger.new
-#		set_reqd_var_from_config :name
 		[:name, :target].each { |key| set_reqd_var_from_config key }
-#		set_reqd_var_from_config :target
+		[:run_as_sudo].each { |key| set_boolean_var_from_config key }
 		[:source, :action, :action_arg, :options, :env,
 			:passphrase].each do |key|
 			set_var_from_config key
@@ -41,6 +40,10 @@ class Ruplite
 
 	def set_var_from_config(key)
 		self.instance_variable_set("@#{key}", @config[key])
+	end
+
+	def set_boolean_var_from_config(key)
+		self.instance_variable_set("@#{key}", check_boolean(@config[key]))
 	end
 
 	def action_no_source
@@ -99,7 +102,9 @@ class Ruplite
 	end
 
 	def cmd
-		cmdarr = ['duplicity']
+		cmdarr = []
+		cmdarr = ['sudo'] if @run_as_sudo
+		cmdarr << ['duplicity']
 		cmdarr << @action if @action
 		cmdarr << @action_arg if @action_arg
 		cmdarr << '--name'
