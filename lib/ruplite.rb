@@ -171,53 +171,53 @@ class Ruplite
 #		cmdarr.join(" ")
 #	end
 #
-#	def run_cmd
-#		res = {:out => [], :err => []}
-#		status = Open4::popen4("sh") do |pid, stdin, stdout, stderr|
-#			@env.each do |k, v|
-#				stdin.puts "echo \"exporting #{k}\""
-#				stdin.puts "export #{k}=#{v}"
-#			end
-#			stdin.puts "echo \"running #{cmd}\""
-#			stdin.puts cmd
-#			@env.each_key do |k|
-#				stdin.puts "echo \"unsetting #{k}\""
-#				stdin.puts "unset #{k}"
-#			end
-#			stdin.close
-#			stdout.readlines.each { |l| res[:out] << l.strip }
-#			stderr.readlines.each { |l| res[:err] << l.strip }
-#		end
-#		res[:exit_status] = status.exitstatus
-#		res
-#	end
-#
-#	def run
-#		details_arr =[]
-#		details_arr << "Running duplicity backup called #{@name}"
-#		details_arr << "calling with #{cmd}"
-##		details_arr.each { |l| @logger.info l }
-#
-#		runinfo = run_cmd
-#
-#		details_arr = details_arr + runinfo[:out]
-#		if runinfo[:err].length > 0
-#			details_arr << "**** Stderr ****"
-#			details_arr = details_arr + runinfo[:err]
-#		end
-#
-#		runinfo[:out].each { |l| @logger.info l }
-#		runinfo[:err].each { |l| @logger.error l }
-#
-#		s = "Exit status was #{runinfo[:exit_status]}"
-#		if runinfo[:exit_status] = 0
-#			@logger.info s
-#		else
-#			@logger.error s
-#		end
-#		details_arr << s
-#
-#		@run_info = details_arr.join("\n")
-#	end
+	def run_cmd
+		res = {:out => [], :err => []}
+		status = Open4::popen4("sh") do |pid, stdin, stdout, stderr|
+			@env.each do |k, v|
+				stdin.puts "echo \"exporting #{k}\""
+				stdin.puts "export #{k}=#{v}"
+			end
+			stdin.puts "echo \"running #{cmd}\""
+			stdin.puts cmd
+			@env.each_key do |k|
+				stdin.puts "echo \"unsetting #{k}\""
+				stdin.puts "unset #{k}"
+			end
+			stdin.close
+			stdout.readlines.each { |l| res[:out] << l.strip }
+			stderr.readlines.each { |l| res[:err] << l.strip }
+		end
+		res[:exit_status] = status.exitstatus
+		res
+	end
+
+	def run
+		details_arr =[]
+		details_arr << "Running duplicity backup called #{@name}"
+		details_arr << "calling with #{cmd}"
+#		details_arr.each { |l| @logger.info l }
+
+		runinfo = run_cmd
+
+		details_arr = details_arr + runinfo[:out]
+		if runinfo[:err].length > 0
+			details_arr << "**** Stderr ****"
+			details_arr = details_arr + runinfo[:err]
+		end
+
+		runinfo[:out].each { |l| @logger.info l }
+		runinfo[:err].each { |l| @logger.error l }
+
+		s = "Exit status was #{runinfo[:exit_status]}"
+		if runinfo[:exit_status] = 0
+			@logger.info s
+		else
+			@logger.error s
+		end
+		details_arr << s
+
+		@run_info = details_arr.join("\n")
+	end
 
 end
