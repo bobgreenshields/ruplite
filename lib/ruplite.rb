@@ -98,6 +98,9 @@ class Ruplite
 
 	def initialize_env
 		@env = {}
+		if @config.has_key? :env
+			@config[:env].each { |k, v| @env[k.upcase] = v }
+		end
 		@env["PASSPHRASE"] = @passphrase if @passphrase 
 	end
 

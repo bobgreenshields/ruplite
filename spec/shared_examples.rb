@@ -124,12 +124,33 @@
 
 	end # action with a source
 
+	shared_examples_for "all non passphrase env items" do
+		it "@env should have all non PASSPHRASE items in config" do
+			@config || @config[:env].each do |k, v|
+				unless k.upcase == "PASSPHRASE"
+					Ruplite.new(@config).env.keys.should include k.upcase
+					Ruplite.new(@config).env[k.upcase].should == v
+				end
+			end
+		end
+	end
 
 	shared_examples_for "all env with a passphrase key" do
+		it_behaves_like "all non passphrase env items"
+
 		it "should have a key of PASSPHRASE" do
 			Ruplite.new(@config).env.keys.should include "PASSPHRASE"
 		end
 		it "should have the password for the key of PASSPHRASE" do
 			Ruplite.new(@config).env["PASSPHRASE"].should == @password
+		end
+	end
+
+	shared_examples_for "all env with no passphrase key" do
+		it_behaves_like "all non passphrase env items"
+
+		it "@env should have same no. of items as config" do
+			target = @config[:env].length
+			Ruplite.new(@config).env.should have(target).things
 		end
 	end

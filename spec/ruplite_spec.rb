@@ -54,21 +54,30 @@ describe Ruplite do
 				Ruplite.new(@config).env.should be_a_kind_of Hash
 			end
 			context "with no passphrase key set" do
-#				it "should have no items" do
-#					Ruplite.new(@config).env.should have(0).things
-#				end
+				it_behaves_like "all env with no passphrase key"
 			end
 			context "with a passphrase key set" do
 				include_context "with a passphrase key set"
 
 				context "with no passphrase in the env" do
 					it_behaves_like "all env with a passphrase key"
+
+					it "@env should have 1 extra item than config" do
+						target = @config[:env].length + 1
+						Ruplite.new(@config).env.should have(target).things
+					end
+
 				end
 
 				context "with a passphrase in the env" do
 					before :each do
 						@env["PASSPHRASE"] = @env_pword
 					end
+
+				it "@env should have same no. of items as config" do
+					target = @config[:env].length
+					Ruplite.new(@config).env.should have(target).things
+				end
 
 					it_behaves_like "all env with a passphrase key"
 				end
